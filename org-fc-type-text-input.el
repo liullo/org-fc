@@ -84,7 +84,7 @@ function is expected to be called with point on a heading."
         (org-fc-hide-region
          end (1+ end)
          (concat
-          " (expected: "
+          "\n (expected: "
           (if (null (car deemph))
               (cdr diff)
             (org-fc-emphasize
