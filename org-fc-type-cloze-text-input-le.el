@@ -163,6 +163,7 @@ Processes all holes in the card text."
   (org-show-entry)
   (org-fc-type-cloze-text-input-le-hide-holes (string-to-number position)))
 
+;; Not neccessary
 (defun org-fc-type-cloze-text-input-le-flip ()
   "Flip a cloze card."
   (org-show-children)
@@ -201,7 +202,10 @@ Processes all holes in the card text."
 (org-fc-register-type
  'cloze_input
  'org-fc-type-cloze-text-input-le-setup
- 'org-fc-type-cloze-text-input-le-flip
+
+ ;; no need for flip
+ ;; 'org-fc-type-cloze-text-input-le-flip
+ nil
  'org-fc-type-cloze-text-input-le-update)
 
 ;;; Footer
