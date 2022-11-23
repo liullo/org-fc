@@ -40,6 +40,7 @@
 (require 'org-fc-type-double)
 (require 'org-fc-type-text-input)
 (require 'org-fc-type-cloze)
+(require 'org-fc-type-cloze-text-input-le)
 
 ;;; Footer
 
