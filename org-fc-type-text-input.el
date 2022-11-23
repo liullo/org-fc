@@ -84,12 +84,14 @@ function is expected to be called with point on a heading."
         (org-fc-hide-region
          end (1+ end)
          (concat
-          "\n (expected: "
+
+          ;; original text
+          "\n\n"
           (if (null (car deemph))
               (cdr diff)
             (org-fc-emphasize
              (concat (car deemph) (cdr diff) (car deemph))))
-          ")\n"))))
+          "\n"))))
   ;; Reveal answer & diff
   (save-excursion
     (org-show-entry)

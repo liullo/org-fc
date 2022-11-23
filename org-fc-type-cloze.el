@@ -37,7 +37,7 @@
   :group 'org-fc)
 
 (defface org-fc-type-cloze-hole-face
-  '((t (:bold t)))
+  '((t (:bold t :foreground "red")))
   "Face for org-fc cloze card holes."
   :group 'org-fc)
 
