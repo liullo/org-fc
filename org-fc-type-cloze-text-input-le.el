@@ -83,6 +83,22 @@ CURRENT-INDEX is the index of the current position in the list of all holes."
     (outline-next-heading)
     (1- (point))))
 
+
+
+;; Global var storing current fc text
+;; 1. 'org-fc-type-cloze-text-input-le-hide-holes' set it
+;; 2. 'org-fc-type-cloze-text-input-le-setup' use it
+(defvar le/fc-current-hole-text "")
+(defvar le/fc-current-hole-begin 0)
+
+
+(defun le/fc-diff (original-text)
+  "Diff from ORIGINAL-TEXT to current card text in le/fc-current-card-text."
+  (let* ((diff (org-fc-diff (read-string "Answer: ") original-text)))
+    (message (concat (car diff) "\n" (cdr diff)))
+    )
+  )
+
 (defun org-fc-type-cloze-text-input-le-hide-holes (position)
   "HHAH Hide holes of a card of TYPE in relation to POSITION."
   (org-fc-with-point-at-entry
@@ -120,14 +136,10 @@ CURRENT-INDEX is the index of the current position in the list of all holes."
            hole-beg hole-end
            'face 'org-fc-type-cloze-text-input-le-hole-face)
 
-          ;; New added code
-          (let* ((text (buffer-substring-no-properties text-beg text-end))
-                 (diff (org-fc-diff (read-string "Answer: ") text)))
+          ;; used by le/fc-diff
+          (setq le/fc-current-hole-text (buffer-substring-no-properties text-beg text-end))
+          (setq le/fc-current-hole-begin hole-beg)
 
-            (save-excursion
-              (goto-char (point-max))
-              (org-fc-hide-region (1- (point)) (point) (concat "\n\n" (car diff) "\n" (cdr diff))))
-            )
           )
 
          ;; If the text of another hole should be visible,
@@ -137,8 +149,7 @@ CURRENT-INDEX is the index of the current position in the list of all holes."
           (org-fc-hide-region text-end hole-end))
          ;; If the text of another hole should not be visible,
          ;; hide the whole hole
-         (t (org-fc-hide-region hole-beg hole-end "..."))
-
+         (t (org-fc-hide-region hole-beg hole-end "[...]"))
          ))))))
 
 ;;; Setup / Flipping
@@ -151,7 +162,7 @@ Processes all holes in the card text."
                  (completing-read "Cloze Type: " org-fc-type-cloze-text-input-le-types))))
   (unless (member type org-fc-type-cloze-text-input-le-types)
     (error "Invalid cloze card type: %s" type))
-  (org-fc--init-card "cloze_input")
+  (org-fc--init-card "cloze_input_le")
   (org-fc-type-cloze-text-input-le-update)
   (org-set-property org-fc-type-cloze-text-input-le-type-property (format "%s" type)))
 
@@ -161,7 +172,16 @@ Processes all holes in the card text."
   (setq org-fc-type-cloze-text-input-le--hint nil)
   (outline-hide-subtree)
   (org-show-entry)
-  (org-fc-type-cloze-text-input-le-hide-holes (string-to-number position)))
+
+  (org-fc-type-cloze-text-input-le-hide-holes (string-to-number position))
+
+  ;; recenter to the current hole
+  (save-excursion
+    (goto-char le/fc-current-hole-begin)
+    (recenter)
+    (le/fc-diff le/fc-current-hole-text)
+    )
+  )
 
 ;; Not neccessary
 (defun org-fc-type-cloze-text-input-le-flip ()
@@ -200,7 +220,7 @@ Processes all holes in the card text."
     (org-fc-review-data-update (reverse ids))))
 
 (org-fc-register-type
- 'cloze_input
+ 'cloze_input_le
  'org-fc-type-cloze-text-input-le-setup
 
  ;; no need for flip
